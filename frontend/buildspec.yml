@@ -4,14 +4,16 @@ phases:
   install:
     runtime-versions:
       nodejs: 20
-
     commands:
+      - cd ./frontend
       - npm install
 
   build:
     commands:
+      - cd ./frontend
       - npm run build
 
 artifacts:
   files:
-    - dist/**/*
+    - "**/*"
+  base-directory: "./frontend/dist"
