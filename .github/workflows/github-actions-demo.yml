@@ -1,0 +1,41 @@
+name: Trigger AWS CodePipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # this is important, it denotes how many commits to fetch
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Check for changes in backend and frontend directories
+        id: diff
+        run: |
+          BACKEND_CHANGED=$(git diff --name-only HEAD^ HEAD | grep backend/)
+          FRONTEND_CHANGED=$(git diff --name-only HEAD^ HEAD | grep frontend/)
+          echo ::set-output name=backend_changed::${BACKEND_CHANGED}
+          echo ::set-output name=frontend_changed::${FRONTEND_CHANGED}
+
+      - name: Trigger Backend Pipeline
+        if: steps.diff.outputs.backend_changed != ''
+        run: |
+          aws codepipeline start-pipeline-execution --name backend-pipeline
+
+      - name: Trigger Frontend Pipeline
+        if: steps.diff.outputs.frontend_changed != ''
+        run: |
+          aws codepipeline start-pipeline-execution --name frontend-pipeline
