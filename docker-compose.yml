@@ -11,3 +11,16 @@ services:
     volumes:
       - ./frontend:/app
     command: sh -c "npm install && npm run dev"
+
+  localstack:
+    container_name: "localstack"
+    image: localstack/localstack
+    environment:
+      - DEBUG=0
+    ports:
+      - "0.0.0.0:4566:4566"
+      - "0.0.0.0:4510-4559:4510-4559"
+    volumes:
+      - "./backend/volume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./backend:/opt/code/localstack/backend"
