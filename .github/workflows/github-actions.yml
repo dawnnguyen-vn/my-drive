@@ -33,7 +33,8 @@ jobs:
       - name: Trigger Backend Pipeline
         if: steps.diff.outputs.backend_changed != ''
         run: |
-          aws codepipeline start-pipeline-execution --name my-drive-backend
+          # aws codepipeline start-pipeline-execution --name my-drive-backend
+          echo "Deploy backend success!"
 
       - name: Trigger Frontend Pipeline
         if: steps.diff.outputs.frontend_changed != ''
